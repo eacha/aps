@@ -3,7 +3,15 @@ package thread
 import (
 	"testing"
 	"time"
+
+	. "gopkg.in/check.v1"
 )
+
+func Test(t *testing.T) { TestingT(t) }
+
+type ThreadSuite struct{}
+
+var _ = Suite(&ThreadSuite{})
 
 func simpleThread(threadId, readLines, sleepTime int, c chan ThreadStatistic) {
 	ts := NewThreadStadistic(threadId)
@@ -19,86 +27,53 @@ func simpleThread(threadId, readLines, sleepTime int, c chan ThreadStatistic) {
 
 }
 
-func TestSimple(t *testing.T) {
-	c := make(chan ThreadStatistic)
+func (s *ThreadSuite) TestSimple(c *C) {
+	channel := make(chan ThreadStatistic)
 
-	go simpleThread(1, 1, 100, c)
-	ts := <-c
+	go simpleThread(1, 1, 100, channel)
+	ts := <-channel
 
-	if ts.ThreadId != 1 {
-		t.Error("Expected Thread Id 1, got", ts.ThreadId)
-	}
-
-	if ts.ProcessedLines != 1 {
-		t.Error("Expected Read Lines 1, got", ts.ProcessedLines)
-	}
+	c.Assert(ts.ThreadId, Equals, 1)
+	c.Assert(ts.ProcessedLines, Equals, 1)
 }
 
-func TestMultiRead(t *testing.T) {
-	c := make(chan ThreadStatistic)
+func (s *ThreadSuite) TestMultiRead(c *C) {
+	channel := make(chan ThreadStatistic)
 
-	go simpleThread(1, 10, 100, c)
-	ts := <-c
+	go simpleThread(1, 10, 100, channel)
+	ts := <-channel
 
-	if ts.ThreadId != 1 {
-		t.Error("Expected Thread Id 1, got", ts.ThreadId)
-	}
-
-	if ts.ProcessedLines != 10 {
-		t.Error("Expected Read Lines 10, got", ts.ProcessedLines)
-	}
-
-	if 1000 > ts.DeltaTime && 1010 < ts.DeltaTime {
-		t.Error("Expected Delta Time 1000, got", ts.ThreadId)
-	}
+	c.Assert(ts.ThreadId, Equals, 1)
+	c.Assert(ts.ProcessedLines, Equals, 10)
+	c.Assert(1000 <= ts.DeltaTime, Equals, true)
+	c.Assert(1010 >= ts.DeltaTime, Equals, true)
 }
 
-func TestMultiThreads(t *testing.T) {
-	c := make(chan ThreadStatistic)
+func (s *ThreadSuite) TestMultiThreads(c *C) {
+	channel := make(chan ThreadStatistic)
 
-	go simpleThread(1, 5, 100, c)
-	go simpleThread(2, 10, 100, c)
-	go simpleThread(3, 15, 100, c)
+	go simpleThread(1, 5, 100, channel)
+	go simpleThread(2, 10, 100, channel)
+	go simpleThread(3, 15, 100, channel)
 
-	ts := <-c
+	ts := <-channel
 
-	if ts.ThreadId != 1 {
-		t.Error("Expected Thread Id 1, got", ts.ThreadId)
-	}
+	c.Assert(ts.ThreadId, Equals, 1)
+	c.Assert(ts.ProcessedLines, Equals, 5)
+	c.Assert(500 <= ts.DeltaTime, Equals, true)
+	c.Assert(510 >= ts.DeltaTime, Equals, true)
 
-	if ts.ProcessedLines != 5 {
-		t.Error("Expected Read Lines 5, got", ts.ProcessedLines)
-	}
+	ts = <-channel
 
-	if 500 > ts.DeltaTime && 510 < ts.DeltaTime {
-		t.Error("Expected Delta Time 500, got", ts.ThreadId)
-	}
+	c.Assert(ts.ThreadId, Equals, 2)
+	c.Assert(ts.ProcessedLines, Equals, 10)
+	c.Assert(1000 <= ts.DeltaTime, Equals, true)
+	c.Assert(1010 >= ts.DeltaTime, Equals, true)
 
-	ts = <-c
+	ts = <-channel
 
-	if ts.ThreadId != 2 {
-		t.Error("Expected Thread Id 2, got", ts.ThreadId)
-	}
-
-	if ts.ProcessedLines != 10 {
-		t.Error("Expected Read Lines 10, got", ts.ProcessedLines)
-	}
-
-	if 1000 > ts.DeltaTime && 1010 < ts.DeltaTime {
-		t.Error("Expected Delta Time 1000, got", int(ts.DeltaTime))
-	}
-
-	ts = <-c
-
-	if ts.ThreadId != 3 {
-		t.Error("Expected Thread Id 3, got", ts.ThreadId)
-	}
-
-	if ts.ProcessedLines != 15 {
-		t.Error("Expected Read Lines 15, got", ts.ProcessedLines)
-	}
-
-	if 1500 > ts.DeltaTime && 1510 < ts.DeltaTime {
-		t.Error("Expected Delta Time 1500, got", int(ts.DeltaTime))
-	}
+	c.Assert(ts.ThreadId, Equals, 3)
+	c.Assert(ts.ProcessedLines, Equals, 15)
+	c.Assert(1500 <= ts.DeltaTime, Equals, true)
+	c.Assert(1510 >= ts.DeltaTime, Equals, true)
 }

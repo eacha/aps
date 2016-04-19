@@ -1,22 +1,21 @@
 package scan
 
 import (
+	. "gopkg.in/check.v1"
 	"testing"
 	"time"
 )
 
-func TestScanOptions(t *testing.T) {
+func Test(t *testing.T) { TestingT(t) }
+
+type ScanSuite struct{}
+
+var _ = Suite(&ScanSuite{})
+
+func (s *ScanSuite) TestScanOptions(c *C) {
 	so := NewScanOptions(25, 20, 50)
 
-	if so.Port != 25 {
-		t.Error("Expected Port 25, got", so.Port)
-	}
-
-	if so.ConnectionTimeout != 20*time.Second {
-		t.Error("Expected Connection Timeout 20000000000, got", so.Port)
-	}
-
-	if so.IOTimeout != 50*time.Second {
-		t.Error("Expected Input-Output Timeout 50000000000, got", so.Port)
-	}
+	c.Assert(so.Port, Equals, uint16(25))
+	c.Assert(so.ConnectionTimeout, Equals, 20*time.Second)
+	c.Assert(so.IOTimeout, Equals, 50*time.Second)
 }
