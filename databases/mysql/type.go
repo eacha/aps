@@ -29,6 +29,6 @@ type MySQL struct {
 	Version      string     `json:"version,omitempty"`
 	ThreadId     uint32     `json:"thread_id,omitempty"`
 	Capabilities []string   `json:"capabilies,omitempty"`
-	Charset      byte       `json:"charset,omitempty"`
+	Charset      string     `json:"charset,omitempty"`
 	Status       uint16     `json:"status,omitempty"`
 }

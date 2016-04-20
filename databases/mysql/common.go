@@ -44,8 +44,8 @@ var capabilities = map[string]uint16{
 	"Support41Auth":                0x8000,
 }
 
-//var charset = map[byte]string{
-//	"latin1_swedish_ci": 0x08,
-//	"utf8_general_ci":   0x21,
-//	"binary":            0x63,
-//}
+var charset = map[byte]string{
+	0x08: "latin1_swedish_ci",
+	0x21: "utf8_general_ci",
+	0x63: "binary",
+}
