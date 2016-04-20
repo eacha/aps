@@ -103,8 +103,8 @@ func (s *MySQLSuite) TestReadError(c *C) {
 	go func() { // Client
 		defer wc.Done()
 		buffer := make([]byte, 10)
-		data := MySQL{Ip: "127.0.0.1", Port: 3306}
-		mysqlConn, err := NewMySQLConnection("", 3306, 10, 10, &data)
+		data := MySQL{Ip: "127.0.0.1", Port: 12345}
+		mysqlConn, err := NewMySQLConnection("", 12345, 10, 10, &data)
 
 		if err != nil {
 			c.Fatalf("Connection Error: %s", err.Error())
@@ -118,7 +118,7 @@ func (s *MySQLSuite) TestReadError(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 3306, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -131,8 +131,8 @@ func (s *MySQLSuite) TestWriteError(c *C) {
 	wc.Add(1)
 	go func() { // Client
 		defer wc.Done()
-		data := MySQL{Ip: "127.0.0.1", Port: 3306}
-		mysqlConn, err := NewMySQLConnection("", 3306, 10, 10, &data)
+		data := MySQL{Ip: "127.0.0.1", Port: 12345}
+		mysqlConn, err := NewMySQLConnection("", 12345, 10, 10, &data)
 
 		if err != nil {
 			c.Fatalf("Connection Error: %s", err.Error())
@@ -146,7 +146,7 @@ func (s *MySQLSuite) TestWriteError(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 3306, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -160,8 +160,8 @@ func (s *MySQLSuite) TestReadTimeout(c *C) {
 	go func() { // Client
 		defer wc.Done()
 		buffer := make([]byte, 10)
-		data := MySQL{Ip: "127.0.0.1", Port: 3306}
-		mysqlConn, err := NewMySQLConnection("", 3306, 1, 1, &data)
+		data := MySQL{Ip: "127.0.0.1", Port: 12345}
+		mysqlConn, err := NewMySQLConnection("", 12345, 1, 1, &data)
 
 		if err != nil {
 			c.Fatalf("Connection Error: %s", err.Error())
@@ -175,7 +175,7 @@ func (s *MySQLSuite) TestReadTimeout(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 3306, ToWrite: banner, WriteWait: 2}
+	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 2}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -188,8 +188,8 @@ func (s *MySQLSuite) TestRealSuccess(c *C) {
 	wc.Add(1)
 	go func() { // Client
 		defer wc.Done()
-		data := MySQL{Ip: "127.0.0.1", Port: 3306}
-		mysqlConn, err := NewMySQLConnection("", 3306, 10, 10, &data)
+		data := MySQL{Ip: "127.0.0.1", Port: 12345}
+		mysqlConn, err := NewMySQLConnection("", 12345, 10, 10, &data)
 
 		if err != nil {
 			c.Fatalf("Connection Error: %s", err.Error())
@@ -209,7 +209,7 @@ func (s *MySQLSuite) TestRealSuccess(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 3306, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -222,8 +222,8 @@ func (s *MySQLSuite) TestRealError(c *C) {
 	wc.Add(1)
 	go func() { // Client
 		defer wc.Done()
-		data := MySQL{Ip: "127.0.0.1", Port: 3306}
-		mysqlConn, err := NewMySQLConnection("", 3306, 10, 10, &data)
+		data := MySQL{Ip: "127.0.0.1", Port: 12345}
+		mysqlConn, err := NewMySQLConnection("", 12345, 10, 10, &data)
 		if err != nil {
 			c.Fatalf("Connection Error: %s", err.Error())
 		}
@@ -236,7 +236,7 @@ func (s *MySQLSuite) TestRealError(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 3306, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
