@@ -36,5 +36,4 @@ func main() {
 	(&server).RunServer()
 
 	wg.Wait()
-	fmt.Println("hola")
 }
