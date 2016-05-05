@@ -1,5 +1,11 @@
 package mssql
 
+/*
+Source Script:
+https://github.com/nmap/nmap/blob/6f43ac38b2844c49e323ab56a45dd27d5ba338fb/nselib/mssql.lua#L876
+https://github.com/nmap/nmap/blob/6f43ac38b2844c49e323ab56a45dd27d5ba338fb/scripts/ms-sql-info.nse
+*/
+
 import (
 	"encoding/binary"
 	"github.com/eacha/aps/util"
