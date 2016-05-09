@@ -64,7 +64,7 @@ func newQuestion(qname string, qtype, qclass uint16) *Question {
 }
 
 func (q *Question) packBuffer(buf []byte, pos int) int {
-	pos = q.qnameToBytes(buf, pos)
+	pos = qnameToBytes(q.Qname, buf, pos)
 	binary.BigEndian.PutUint16(buf[pos:pos+2], q.Qtype)
 	binary.BigEndian.PutUint16(buf[pos+2:pos+4], q.Qclass)
 
@@ -72,41 +72,18 @@ func (q *Question) packBuffer(buf []byte, pos int) int {
 }
 
 func (q *Question) unpackBuffer(buf []byte, pos int) int {
-	pos = q.bytesToQname(buf, pos)
+	q.Qname, pos = bytesToQname(buf, pos)
 	q.Qtype = binary.BigEndian.Uint16(buf[pos : pos+2])
 	q.Qclass = binary.BigEndian.Uint16(buf[pos+2 : pos+4])
 
 	return pos + 4
 }
 
-func (q *Question) qnameToBytes(buf []byte, pos int) int {
-	for _, seg := range strings.Split(q.Qname, ".") {
-		buf[pos] = uint8(len(seg))
-		pos = util.CopySliceInto([]byte(seg), buf, pos+1)
-	}
-
-	return pos + 1
-}
-
-func (q *Question) bytesToQname(buf []byte, pos int) int {
-	nullPos := util.ByteIndexOf(buf, 0x00, pos)
-	qnameSlice := buf[pos:nullPos]
-
-	for i := 0; i < len(qnameSlice); {
-		stringLen := int(qnameSlice[i])
-		q.Qname += string(qnameSlice[i+1 : i+stringLen+1])
-		q.Qname += "."
-		i += stringLen + 1
-	}
-
-	return nullPos + 1
-}
-
 func NewQuery(name string, recursive uint16) *Query {
 	var q Query
 
-	q.header = *newHeader(QrQuery, OpcodeQuery, NonAuthoritative, NonTruncated, recursive, NonRecursiveAvailable, 1, 0, 0, 0)
-	q.question = *newQuestion(name, TypeA, ClassINET)
+	q.Header = *newHeader(QrQuery, OpcodeQuery, NonAuthoritative, NonTruncated, recursive, NonRecursiveAvailable, 1, 0, 0, 0)
+	q.Question = *newQuestion(name, TypeA, ClassINET)
 
 	return &q
 }
@@ -114,13 +91,70 @@ func NewQuery(name string, recursive uint16) *Query {
 func (q *Query) Pack() []byte {
 	buf := make([]byte, 1024)
 
-	offset := q.header.packBuffer(buf, 0)
-	offset = q.question.packBuffer(buf, offset)
+	offset := q.Header.packBuffer(buf, 0)
+	offset = q.Question.packBuffer(buf, offset)
 
 	return buf[:offset]
 }
 
 func (q *Query) UnPack(buf []byte) {
-	pos := q.header.unpackBuffer(buf, 0)
-	pos = q.question.unpackBuffer(buf, pos)
+	pos := q.Header.unpackBuffer(buf, 0)
+	pos = q.Question.unpackBuffer(buf, pos)
+}
+
+func (a *Answer) unpackBuffer(buf []byte, pos int) int {
+	namePtr :=  binary.BigEndian.Uint16(buf[pos : pos+2]) & 0x3FFF
+
+	a.Aname, _ = bytesToQname(buf, int(namePtr))
+	a.Atype = binary.BigEndian.Uint16(buf[pos+2 : pos+4])
+	a.Aclass = binary.BigEndian.Uint16(buf[pos+4 : pos+6])
+	a.Attl = binary.BigEndian.Uint32(buf[pos+6 : pos+10])
+	a.RdLength = binary.BigEndian.Uint16(buf[pos+10 : pos+12])
+
+	if a.Atype == TypeA {
+		a.RdDataA = binary.BigEndian.Uint32(buf[pos+12 : pos+16])
+		pos += 16
+	} else if a.Atype == TypeNS || a.Atype == TypeCNAME {
+		a.RdDataNS, pos = bytesToQname(buf, pos+12)
+	} else {
+		pos += 12 + int(a.RdLength)
+	}
+
+	return pos
+}
+
+func (r *Response) UnPack(buf []byte) {
+	pos := r.Header.unpackBuffer(buf, 0)
+
+	r.Question = make([]Question, r.Header.Qdcount)
+	r.Answer = make([]Answer, r.Header.Ancount)
+
+	for i := 0; i < len(r.Question); i++ {
+		pos = r.Question[i].unpackBuffer(buf, pos)
+	}
+	for i := 0; i < len(r.Answer); i++ {
+		pos = r.Answer[i].unpackBuffer(buf, pos)
+	}
+}
+func qnameToBytes(name string, buf []byte, pos int) int {
+	for _, seg := range strings.Split(name, ".") {
+		buf[pos] = uint8(len(seg))
+		pos = util.CopySliceInto([]byte(seg), buf, pos+1)
+	}
+
+	return pos + 1
+}
+
+func bytesToQname(buf []byte, pos int) (string, int) {
+	nullPos := util.ByteIndexOf(buf, 0x00, pos)
+	qnameSlice, name := buf[pos:nullPos], ""
+
+	for i := 0; i < len(qnameSlice); {
+		stringLen := int(qnameSlice[i])
+		name += string(qnameSlice[i+1 : i+stringLen+1])
+		name += "."
+		i += stringLen + 1
+	}
+
+	return name, nullPos + 1
 }

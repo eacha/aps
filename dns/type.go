@@ -37,6 +37,15 @@ const (
 	// Valid Question.Qtype
 	TypeNone uint16 = 0
 	TypeA    uint16 = 1
+	TypeNS uint16 = 2
+	TypeCNAME uint16 = 5
+	TypeSOA uint16 = 6
+	TypeWKS uint16 = 11
+	TypePTR uint16 = 12
+	TypeMX uint16 = 15
+	TypeSRV uint16 = 33
+	TypeAAAA uint16 = 28
+	TypeANy uint16 = 255
 
 	// Valid Question.Qclass
 	ClassINET uint16 = 1
@@ -68,8 +77,8 @@ type Question struct {
 }
 
 type Query struct {
-	header   Header
-	question Question
+	Header   Header
+	Question Question
 }
 
 type Answer struct {
@@ -78,4 +87,12 @@ type Answer struct {
 	Aclass   uint16
 	Attl     uint32
 	RdLength uint16
+	RdDataA uint32
+	RdDataNS string
+}
+
+type Response struct {
+	Header   Header
+	Question []Question
+	Answer   []Answer
 }
