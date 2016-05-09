@@ -68,8 +68,8 @@ type Question struct {
 }
 
 type Query struct {
-	header   *Header
-	question *Question
+	header   Header
+	question Question
 }
 
 type Answer struct {

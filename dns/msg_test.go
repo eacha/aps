@@ -84,8 +84,8 @@ func (dns *DnsMsg) TestUnPackQuestion(c *C) {
 	question.unpackBuffer(PACK_QUESTION, 0)
 
 	c.Assert(question.Qname, Equals, "www.uchile.cl.")
-	c.Assert(question.Qtype, Equals, uint16(1))
-	c.Assert(question.Qclass, Equals, uint16(1))
+	c.Assert(question.Qtype, Equals, TypeA)
+	c.Assert(question.Qclass, Equals, ClassINET)
 }
 
 func (dns *DnsMsg) TestPackQuery(c *C) {
@@ -93,4 +93,20 @@ func (dns *DnsMsg) TestPackQuery(c *C) {
 	buffer := query.Pack()
 
 	c.Assert(buffer, DeepEquals, PACK_QUERY)
+}
+
+func (dns *DnsMsg) TestUnPackQuery(c *C) {
+	var query Query
+	query.UnPack(PACK_QUERY)
+
+	c.Assert(query.header.Id, Equals, ID)
+	c.Assert(query.header.Bits, Equals, BITS)
+	c.Assert(query.header.Qdcount, Equals, QD_COUNT)
+	c.Assert(query.header.Ancount, Equals, AN_COUNT)
+	c.Assert(query.header.Nscount, Equals, NS_COUNT)
+	c.Assert(query.header.Arcount, Equals, AR_COUNT)
+
+	c.Assert(query.question.Qname, Equals, "www.uchile.cl.")
+	c.Assert(query.question.Qtype, Equals, TypeA)
+	c.Assert(query.question.Qclass, Equals, ClassINET)
 }

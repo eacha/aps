@@ -105,8 +105,8 @@ func (q *Question) bytesToQname(buf []byte, pos int) int {
 func NewQuery(name string, recursive uint16) *Query {
 	var q Query
 
-	q.header = newHeader(QrQuery, OpcodeQuery, NonAuthoritative, NonTruncated, recursive, NonRecursiveAvailable, 1, 0, 0, 0)
-	q.question = newQuestion(name, TypeA, ClassINET)
+	q.header = *newHeader(QrQuery, OpcodeQuery, NonAuthoritative, NonTruncated, recursive, NonRecursiveAvailable, 1, 0, 0, 0)
+	q.question = *newQuestion(name, TypeA, ClassINET)
 
 	return &q
 }
@@ -118,4 +118,9 @@ func (q *Query) Pack() []byte {
 	offset = q.question.packBuffer(buf, offset)
 
 	return buf[:offset]
+}
+
+func (q *Query) UnPack(buf []byte) {
+	pos := q.header.unpackBuffer(buf, 0)
+	pos = q.question.unpackBuffer(buf, pos)
 }
