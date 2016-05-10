@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"os"
 	"github.com/eacha/aps/util"
+	"sync"
 )
 
 var (
@@ -59,6 +60,17 @@ func printModules() {
 }
 
 func main() {
+	var wg sync.WaitGroup
+	//ts := make([]thread.ThreadStatistic, options.Threads)
+	wg.Add(options.Threads)
+
+	switch options.Module {
+	case "DNS":
+
+	default:
+
+
+	}
 
 }
 

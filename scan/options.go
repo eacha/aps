@@ -2,6 +2,7 @@ package scan
 
 import (
 	"github.com/eacha/aps/tools/thread"
+	"sync"
 )
 
 type Scannable interface {
@@ -15,6 +16,8 @@ type DNSOptions struct {
 
 type ScanOptions struct {
 	// Basic Scan Setup
+	WaitGroup *sync.WaitGroup
+
 	InputFileName string
 	OutputFileName string
 
