@@ -38,7 +38,7 @@ func (s *ConnTimeoutSuite) TestReadError(c *C) {
 	go func() { // Client
 		defer wc.Done()
 		buffer := make([]byte, 10)
-		conn, _ := NewConnTimeout(TCP, "", 12345, 10, 10)
+		conn, _ := NewConnTimeout(TCP, "", 12355, 10, 10)
 
 		conn.Close()
 		_, err := conn.Read(buffer)
@@ -48,7 +48,7 @@ func (s *ConnTimeoutSuite) TestReadError(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 12345, ToWrite: sendData, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12355, ToWrite: sendData, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -61,7 +61,7 @@ func (s *ConnTimeoutSuite) TestWriteError(c *C) {
 	wc.Add(1)
 	go func() { // Client
 		defer wc.Done()
-		conn, _ := NewConnTimeout(TCP, "", 12345, 10, 10)
+		conn, _ := NewConnTimeout(TCP, "", 12356, 10, 10)
 
 		conn.Close()
 		_, err := conn.Write(banner)
@@ -71,7 +71,7 @@ func (s *ConnTimeoutSuite) TestWriteError(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12356, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -85,18 +85,17 @@ func (s *ConnTimeoutSuite) TestReadTimeout(c *C) {
 	go func() { // Client
 		defer wc.Done()
 		buffer := make([]byte, 10)
-		conn, _ := NewConnTimeout(TCP, "", 12345, 1, 1)
+		conn, _ := NewConnTimeout(TCP, "", 12357, 1, 1)
 
 		defer conn.Close()
 
 		_, err := conn.Read(buffer)
 
 		c.Assert(err, DeepEquals, &IOTimeoutError{ReadTimeoutMsg, ""})
-
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 2}
+	server := test.TestingBasicServer{Port: 12357, ToWrite: banner, WriteWait: 2}
 	(&server).RunServer()
 
 	wc.Wait()
@@ -111,7 +110,7 @@ func (s *ConnTimeoutSuite) TestReadSuccess(c *C) {
 		defer wc.Done()
 		buf := make([]byte, 10)
 
-		conn, _ := NewConnTimeout(TCP, "", 12345, 10, 10)
+		conn, _ := NewConnTimeout(TCP, "", 12358, 10, 10)
 		defer conn.Close()
 
 		read, _ := conn.Read(buf)
@@ -120,7 +119,7 @@ func (s *ConnTimeoutSuite) TestReadSuccess(c *C) {
 	}()
 
 	// Server
-	server := test.TestingBasicServer{Port: 12345, ToWrite: banner, WriteWait: 0}
+	server := test.TestingBasicServer{Port: 12358, ToWrite: banner, WriteWait: 0}
 	(&server).RunServer()
 
 	wc.Wait()
