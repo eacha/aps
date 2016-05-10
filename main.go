@@ -62,7 +62,7 @@ func printModules() {
 func main() {
 	var wg sync.WaitGroup
 	//ts := make([]thread.ThreadStatistic, options.Threads)
-	wg.Add(options.Threads)
+	wg.Add(int(options.Threads))
 
 	switch options.Module {
 	case "DNS":
