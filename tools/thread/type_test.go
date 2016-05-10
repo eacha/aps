@@ -1,10 +1,9 @@
 package thread
 
 import (
+	. "gopkg.in/check.v1"
 	"testing"
 	"time"
-
-	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) { TestingT(t) }
