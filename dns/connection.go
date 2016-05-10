@@ -6,7 +6,7 @@ import (
 )
 
 type DNSConn struct {
-	conn connection.ConnTimeout
+	conn *connection.ConnTimeout
 }
 
 func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout time.Duration) (*DNSConn, error) {
@@ -28,16 +28,16 @@ func (c *DNSConn)OpenResolver(question string) (string,  error){
 
 	_, err := c.conn.Write(pack)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	b, err := c.conn.Read(buf)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	var response Response
-	response.UnPack(b[:b])
+	response.UnPack(buf[:b])
 
-	return "ip"
+	return "ip", nil
 }
