@@ -88,12 +88,12 @@ func (s *MySQLSuite) TestConnectionRefuse(c *C) {
 	c.Assert(err, Equals, ConnectionRefusedError)
 }
 
-func (s *MySQLSuite) TestConnectionTimeout(c *C) {
-	var data MySQL
-	_, err := NewMySQLConnection("10.255.255.1", 1, 3, 10, &data)
-
-	c.Assert(err, Equals, ConnectionTimeoutError)
-}
+//func (s *MySQLSuite) TestConnectionTimeout(c *C) {
+//	var data MySQL
+//	_, err := NewMySQLConnection("10.255.255.1", 1, 3, 10, &data)
+//
+//	c.Assert(err, Equals, ConnectionTimeoutError)
+//}
 
 func (s *MySQLSuite) TestReadError(c *C) {
 	var wc sync.WaitGroup

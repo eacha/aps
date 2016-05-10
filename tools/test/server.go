@@ -5,6 +5,7 @@ import (
 	"net"
 	"strconv"
 	"time"
+	"math/rand"
 )
 
 type TestingBasicServer struct {
@@ -35,4 +36,9 @@ func (tbs *TestingBasicServer) RunServer() {
 
 		return
 	}
+}
+
+// Return a random port number between 20000 and 40000
+func RandomPort() int {
+	return rand.Intn(20000) + 20000
 }
