@@ -10,7 +10,7 @@ type Scannable interface {
 
 type DNSOptions struct {
 	QuestionURL string
-	IpResponse  []string
+	IpResponse  string
 }
 
 type ScanOptions struct {
