@@ -19,8 +19,8 @@ type ConnError struct {
 	address string
 }
 
-func (e *ConnError) Error() {
-	return fmt.Sprint("%s, Host: %s", e.msg, e.address)
+func (e *ConnError) Error() string {
+	return fmt.Sprintf("%s, Host: %s", e.msg, e.address)
 }
 
 type IOError struct {
@@ -28,8 +28,8 @@ type IOError struct {
 	address string
 }
 
-func (e *IOError) Error() {
-	return fmt.Sprintln("%s, Host: %s", e.msg, e.address)
+func (e *IOError) Error() string {
+	return fmt.Sprintf("%s, Host: %s", e.msg, e.address)
 }
 
 type IOTimeoutError struct {
@@ -37,6 +37,6 @@ type IOTimeoutError struct {
 	address string
 }
 
-func (e *IOTimeoutError) Error() {
-	return fmt.Sprintln("%s, Host: %s", e.msg, e.address)
+func (e *IOTimeoutError) Error() string {
+	return fmt.Sprintf("%s, Host: %s", e.msg, e.address)
 }
