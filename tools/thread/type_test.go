@@ -13,7 +13,7 @@ type ThreadSuite struct{}
 var _ = Suite(&ThreadSuite{})
 
 func simpleThread(threadId, readLines, sleepTime int, c chan ThreadStatistic) {
-	ts := NewThreadStadistic(threadId)
+	ts := NewThreadStatistic(threadId)
 
 	for i := 0; i < readLines; i++ {
 		ts.IncreaseProcessedLines()

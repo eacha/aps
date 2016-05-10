@@ -2,6 +2,12 @@ package thread
 
 import "time"
 
+type Thredable interface{
+	// Todo add option
+	Run(name int, statistic *ThreadStatistic, read SyncRead, write SyncWrite)
+}
+
+
 type ThreadStatistic struct {
 	ThreadId       int           `json:"thread_id"`
 	ProcessedLines int           `json:"processed_lines"`
@@ -10,7 +16,7 @@ type ThreadStatistic struct {
 	DeltaTime      time.Duration `json:"delta_time"`
 }
 
-func NewThreadStadistic(threadId int) *ThreadStatistic {
+func NewThreadStatistic(threadId int) *ThreadStatistic {
 	var ts ThreadStatistic
 
 	ts.ThreadId = threadId
