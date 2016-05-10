@@ -17,3 +17,12 @@ func Atoi(number string) int {
 func ToByteArrayNullTerminated(str string) []byte {
 	return append([]byte(str), []byte{nullTerminated}...)
 }
+
+func StringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
