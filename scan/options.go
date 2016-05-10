@@ -4,6 +4,15 @@ import (
 	"github.com/eacha/aps/tools/thread"
 )
 
+type Scannable interface {
+	Scan(name int, options ScanOptions, statistic *thread.ThreadStatistic)
+}
+
+type DNSOptions struct {
+	QuestionURL string
+	IpResponse  []string
+}
+
 type ScanOptions struct {
 	// Basic Scan Setup
 	InputFileName string
@@ -14,13 +23,15 @@ type ScanOptions struct {
 
 	Port uint
 	Module string
+	//Protocol string
 	Threads uint
 	ConnectionTimeout uint
 	IOTimeout         uint
 
+	// DNS options
+	DNSOptions DNSOptions
+
 	// More options in the future
 }
 
-type Scannable interface {
-	Scan(name int, options ScanOptions, statistic *thread.ThreadStatistic)
-}
+

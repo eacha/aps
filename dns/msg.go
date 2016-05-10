@@ -136,6 +136,7 @@ func (r *Response) UnPack(buf []byte) {
 		pos = r.Answer[i].unpackBuffer(buf, pos)
 	}
 }
+
 func qnameToBytes(name string, buf []byte, pos int) int {
 	for _, seg := range strings.Split(name, ".") {
 		buf[pos] = uint8(len(seg))

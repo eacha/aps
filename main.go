@@ -27,6 +27,9 @@ func init(){
 	flag.UintVar(&options.ConnectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
 	flag.UintVar(&options.IOTimeout, "io-timeout", 10, "Set input output timeout in seconds")
 
+	flag.StringVar(&options.DNSOptions.QuestionURL, "dns-question", "www.uchile.cl", "Question sent to DNS resolver")
+	flag.StringVar(&options.DNSOptions.IpResponse, "dns-response", "172.29.1.16", "Expected response of the DNS resolver")
+
 	flag.Parse()
 
 	// Help arguments
