@@ -2,12 +2,6 @@ package thread
 
 import "time"
 
-type Thredable interface{
-	// Todo add option
-	Run(name int, statistic *ThreadStatistic, read SyncRead, write SyncWrite)
-}
-
-
 type ThreadStatistic struct {
 	ThreadId       int           `json:"thread_id"`
 	ProcessedLines int           `json:"processed_lines"`

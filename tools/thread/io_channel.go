@@ -20,7 +20,13 @@ func NewSyncRead(fileName string) *SyncRead {
 	var sr SyncRead
 	var err error
 
-	sr.file, err = os.Open(fileName)
+	switch fileName {
+	case "-":
+		sr.file = os.Stdin
+	default:
+		sr.file, err = os.Open(fileName)
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +66,13 @@ func NewSyncWrite(fileName string) *SyncWrite {
 	var sw SyncWrite
 	var err error
 
-	sw.file, err = os.Create(fileName)
+	switch fileName {
+	case "-":
+		sw.file = os.Stdout
+	default:
+		sw.file, err = os.Create(fileName)
+	}
+
 	if err != nil {
 		log.Fatal(err)
 	}
