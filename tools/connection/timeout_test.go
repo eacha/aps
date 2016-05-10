@@ -25,7 +25,7 @@ func (s *ConnTimeoutSuite) TestNewConnectionRefuse(c *C) {
 }
 
 func (s *ConnTimeoutSuite) TestNewConnectionTimeout(c *C) {
-	_, err := NewConnTimeout(TCP, "10.255.255.1", 1, 1, 1)
+	_, err := NewConnTimeout(TCP, "10.255.255.1", 1, 3, 10)
 
 	c.Assert(err, DeepEquals, &ConnError{ConnTimeoutMsg, "10.255.255.1"})
 }
