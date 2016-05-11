@@ -2,7 +2,7 @@ package thread
 
 import "time"
 
-type ThreadStatistic struct {
+type Statistic struct {
 	ThreadId       int           `json:"thread_id"`
 	ProcessedLines int           `json:"processed_lines"`
 	StartTime      time.Time     `json:"start_time"`
@@ -10,8 +10,8 @@ type ThreadStatistic struct {
 	DeltaTime      time.Duration `json:"delta_time"`
 }
 
-func NewThreadStatistic(threadId int) *ThreadStatistic {
-	var ts ThreadStatistic
+func NewStatistic(threadId int) *Statistic {
+	var ts Statistic
 
 	ts.ThreadId = threadId
 	ts.ProcessedLines = 0
@@ -20,11 +20,11 @@ func NewThreadStatistic(threadId int) *ThreadStatistic {
 	return &ts
 }
 
-func (ts *ThreadStatistic) IncreaseProcessedLines() {
+func (ts *Statistic) IncreaseProcessedLines() {
 	ts.ProcessedLines += 1
 }
 
-func (ts *ThreadStatistic) SetEndTime() {
+func (ts *Statistic) SetEndTime() {
 	ts.EndTime = time.Now()
 	ts.DeltaTime = ts.EndTime.Sub(ts.StartTime) / time.Millisecond
 }

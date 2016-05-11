@@ -2,10 +2,10 @@ package test
 
 import (
 	"fmt"
+	"math/rand"
 	"net"
 	"strconv"
 	"time"
-	"math/rand"
 )
 
 type TestingBasicServer struct {

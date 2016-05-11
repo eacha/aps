@@ -1,9 +1,10 @@
 package thread
 
 import (
-	. "gopkg.in/check.v1"
 	"testing"
 	"time"
+
+	. "gopkg.in/check.v1"
 )
 
 func Test(t *testing.T) { TestingT(t) }
@@ -12,8 +13,8 @@ type ThreadSuite struct{}
 
 var _ = Suite(&ThreadSuite{})
 
-func simpleThread(threadId, readLines, sleepTime int, c chan ThreadStatistic) {
-	ts := NewThreadStatistic(threadId)
+func simpleThread(threadId, readLines, sleepTime int, c chan Statistic) {
+	ts := NewStatistic(threadId)
 
 	for i := 0; i < readLines; i++ {
 		ts.IncreaseProcessedLines()
@@ -27,7 +28,7 @@ func simpleThread(threadId, readLines, sleepTime int, c chan ThreadStatistic) {
 }
 
 func (s *ThreadSuite) TestSimple(c *C) {
-	channel := make(chan ThreadStatistic)
+	channel := make(chan Statistic)
 
 	go simpleThread(1, 1, 100, channel)
 	ts := <-channel
@@ -37,7 +38,7 @@ func (s *ThreadSuite) TestSimple(c *C) {
 }
 
 func (s *ThreadSuite) TestMultiRead(c *C) {
-	channel := make(chan ThreadStatistic)
+	channel := make(chan Statistic)
 
 	go simpleThread(1, 10, 100, channel)
 	ts := <-channel
@@ -49,7 +50,7 @@ func (s *ThreadSuite) TestMultiRead(c *C) {
 }
 
 func (s *ThreadSuite) TestMultiThreads(c *C) {
-	channel := make(chan ThreadStatistic)
+	channel := make(chan Statistic)
 
 	go simpleThread(1, 5, 100, channel)
 	go simpleThread(2, 10, 100, channel)

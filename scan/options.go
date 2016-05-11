@@ -1,12 +1,13 @@
 package scan
 
 import (
-	"github.com/eacha/aps/tools/thread"
 	"sync"
+
+	"github.com/eacha/aps/tools/thread"
 )
 
 type Scannable interface {
-	Scan(name int, options ScanOptions, statistic *thread.ThreadStatistic)
+	Scan(name int, options *Options, statistic *thread.Statistic)
 }
 
 type DNSOptions struct {
@@ -14,20 +15,20 @@ type DNSOptions struct {
 	IpResponse  string
 }
 
-type ScanOptions struct {
+type Options struct {
 	// Basic Scan Setup
 	WaitGroup *sync.WaitGroup
 
-	InputFileName string
+	InputFileName  string
 	OutputFileName string
 
-	InputFile *thread.SyncRead
+	InputFile  *thread.SyncRead
 	OutputFile *thread.SyncWrite
 
-	Port uint
+	Port   uint
 	Module string
 	//Protocol string
-	Threads uint
+	Threads           uint
 	ConnectionTimeout uint
 	IOTimeout         uint
 
@@ -36,5 +37,3 @@ type ScanOptions struct {
 
 	// More options in the future
 }
-
-
