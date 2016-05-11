@@ -2,9 +2,58 @@ package dns
 
 import (
 	"encoding/binary"
-	"github.com/eacha/aps/util"
+	"fmt"
 	"strings"
+
+	"encoding/json"
+
+	"github.com/eacha/aps/util"
 )
+
+const (
+	// Header.Bits
+	_QR     = 15
+	_Opcode = 14
+	_AA     = 10
+	_TC     = 9
+	_RD     = 8
+	_RA     = 7
+)
+
+type Header struct {
+	Id      uint16 `json:"id,omitempty"`
+	Bits    uint16 `json:"bits,omitempty"`
+	Qdcount uint16 `json:"qd_count,omitempty"`
+	Ancount uint16 `json:"an_count,omitempty"`
+	Nscount uint16 `json:"ns_count,omitempty"`
+	Arcount uint16 `json:"ar_count,omitempty"`
+}
+
+type Question struct {
+	Qname  string `json:"name,omitempty"`
+	Qtype  uint16 `json:"type,omitempty"`
+	Qclass uint16 `json:"class,omitempty"`
+}
+
+type Answer struct {
+	Aname    string `json:"name,omitempty"`
+	Atype    uint16 `json:"type,omitempty"`
+	Aclass   uint16 `json:"class,omitempty"`
+	Attl     uint32 `json:"ttl,omitempty"`
+	RdLength uint16 `json:"rd_length,omitempty"`
+	RdData   string `json:"rd_data,omitempty"`
+}
+
+type Query struct {
+	Header   Header
+	Question Question
+}
+
+type Response struct {
+	Header   Header
+	Question []Question
+	Answer   []Answer
+}
 
 func newHeader(QR, Opcode, AA, TC, RD, RA, Qdcount, Ancount, Nscount, Arcount uint16) *Header {
 	var h Header
@@ -18,6 +67,7 @@ func newHeader(QR, Opcode, AA, TC, RD, RA, Qdcount, Ancount, Nscount, Arcount ui
 
 	return &h
 }
+
 func completeBits(qr, opcode, aa, tc, rd, ra uint16) uint16 {
 	var bits uint16
 
@@ -71,12 +121,83 @@ func (q *Question) packBuffer(buf []byte, pos int) int {
 	return pos + 4
 }
 
+func qnameToBytes(name string, buf []byte, pos int) int {
+	for _, seg := range strings.Split(name, ".") {
+		buf[pos] = uint8(len(seg))
+		pos = util.CopySliceInto([]byte(seg), buf, pos+1)
+	}
+
+	return pos + 1
+}
+
 func (q *Question) unpackBuffer(buf []byte, pos int) int {
 	q.Qname, pos = bytesToQname(buf, pos)
 	q.Qtype = binary.BigEndian.Uint16(buf[pos : pos+2])
 	q.Qclass = binary.BigEndian.Uint16(buf[pos+2 : pos+4])
 
 	return pos + 4
+}
+
+func bytesToQname(buf []byte, pos int) (string, int) {
+	nullPos := util.ByteIndexOf(buf, 0x00, pos)
+	qnameSlice, name := buf[pos:nullPos], ""
+
+	for i := 0; i < len(qnameSlice); {
+		stringLen := int(qnameSlice[i])
+		name += string(qnameSlice[i+1 : i+stringLen+1])
+		name += "."
+		i += stringLen + 1
+	}
+
+	return name, nullPos + 1
+}
+
+func (q Question) MarshalJSON() ([]byte, error) {
+	type Alias Question
+	return json.Marshal(&struct {
+		Qtype  string `json:"type"`
+		Qclass string `json:"class"`
+		*Alias
+	}{
+		Qtype:  uintToType(q.Qtype),
+		Qclass: uintToClass(q.Qclass),
+		Alias:  (*Alias)(&q),
+	})
+}
+
+func (a *Answer) unpackBuffer(buf []byte, pos int) int {
+	namePtr := binary.BigEndian.Uint16(buf[pos:pos+2]) & 0x3FFF
+
+	a.Aname, _ = bytesToQname(buf, int(namePtr))
+	a.Atype = binary.BigEndian.Uint16(buf[pos+2 : pos+4])
+	a.Aclass = binary.BigEndian.Uint16(buf[pos+4 : pos+6])
+	a.Attl = binary.BigEndian.Uint32(buf[pos+6 : pos+10])
+	a.RdLength = binary.BigEndian.Uint16(buf[pos+10 : pos+12])
+
+	if a.Atype == TypeA {
+		intIp := binary.BigEndian.Uint32(buf[pos+12 : pos+16])
+		a.RdData = fmt.Sprintf("%d.%d.%d.%d", byte(intIp>>24), byte(intIp>>16), byte(intIp>>8), byte(intIp))
+		pos += 16
+	} else if a.Atype == TypeNS || a.Atype == TypeCNAME {
+		a.RdData, pos = bytesToQname(buf, pos+12)
+	} else {
+		pos += 12 + int(a.RdLength)
+	}
+
+	return pos
+}
+
+func (a Answer) MarshalJSON() ([]byte, error) {
+	type Alias Answer
+	return json.Marshal(&struct {
+		Atype  string `json:"type"`
+		Aclass string `json:"class"`
+		*Alias
+	}{
+		Atype:  uintToType(a.Atype),
+		Aclass: uintToClass(a.Aclass),
+		Alias:  (*Alias)(&a),
+	})
 }
 
 func NewQuery(name string, recursive uint16) *Query {
@@ -102,27 +223,6 @@ func (q *Query) UnPack(buf []byte) {
 	pos = q.Question.unpackBuffer(buf, pos)
 }
 
-func (a *Answer) unpackBuffer(buf []byte, pos int) int {
-	namePtr :=  binary.BigEndian.Uint16(buf[pos : pos+2]) & 0x3FFF
-
-	a.Aname, _ = bytesToQname(buf, int(namePtr))
-	a.Atype = binary.BigEndian.Uint16(buf[pos+2 : pos+4])
-	a.Aclass = binary.BigEndian.Uint16(buf[pos+4 : pos+6])
-	a.Attl = binary.BigEndian.Uint32(buf[pos+6 : pos+10])
-	a.RdLength = binary.BigEndian.Uint16(buf[pos+10 : pos+12])
-
-	if a.Atype == TypeA {
-		a.RdDataA = binary.BigEndian.Uint32(buf[pos+12 : pos+16])
-		pos += 16
-	} else if a.Atype == TypeNS || a.Atype == TypeCNAME {
-		a.RdDataNS, pos = bytesToQname(buf, pos+12)
-	} else {
-		pos += 12 + int(a.RdLength)
-	}
-
-	return pos
-}
-
 func (r *Response) UnPack(buf []byte) {
 	pos := r.Header.unpackBuffer(buf, 0)
 
@@ -135,27 +235,4 @@ func (r *Response) UnPack(buf []byte) {
 	for i := 0; i < len(r.Answer); i++ {
 		pos = r.Answer[i].unpackBuffer(buf, pos)
 	}
-}
-
-func qnameToBytes(name string, buf []byte, pos int) int {
-	for _, seg := range strings.Split(name, ".") {
-		buf[pos] = uint8(len(seg))
-		pos = util.CopySliceInto([]byte(seg), buf, pos+1)
-	}
-
-	return pos + 1
-}
-
-func bytesToQname(buf []byte, pos int) (string, int) {
-	nullPos := util.ByteIndexOf(buf, 0x00, pos)
-	qnameSlice, name := buf[pos:nullPos], ""
-
-	for i := 0; i < len(qnameSlice); {
-		stringLen := int(qnameSlice[i])
-		name += string(qnameSlice[i+1 : i+stringLen+1])
-		name += "."
-		i += stringLen + 1
-	}
-
-	return name, nullPos + 1
 }
