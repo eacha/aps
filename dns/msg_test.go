@@ -37,7 +37,7 @@ var (
 	arCount uint16
 )
 
-func Test(t *testing.T) { TestingT(t) }
+func TestMsg(t *testing.T) { TestingT(t) }
 
 type DNSMsg struct{}
 
