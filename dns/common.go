@@ -1,81 +1,87 @@
 package dns
 
+import "errors"
+
 const (
 	// Header.QR Value
-	QrQuery    uint16 = 0
-	QrResponse uint16 = 1
+	qrQuery    uint16 = 0
+	qrResponse uint16 = 1
 
 	// Header.Opcode Value
-	OpcodeQuery  uint16 = 0
-	OpcodeIQuery uint16 = 1
-	OpcodeStatus uint16 = 2
+	opcodeQuery  uint16 = 0
+	opcodeIQuery uint16 = 1
+	opcodeStatus uint16 = 2
 
 	// Header.AA Value
-	NonAuthoritative uint16 = 0
-	Authoritative    uint16 = 1
+	nonAuthoritative uint16 = 0
+	authoritative    uint16 = 1
 
 	// Header.TC Value
-	NonTruncated uint16 = 0
-	Truncated    uint16 = 1
+	nonTruncated uint16 = 0
+	truncated    uint16 = 1
 
 	// Header.RD Value (query)
-	NonRecursiveDesired uint16 = 0
-	RecursiveDesired    uint16 = 1
+	nonRecursiveDesired uint16 = 0
+	recursiveDesired    uint16 = 1
 
 	// Header.RA Value (response)
-	NonRecursiveAvailable uint16 = 0
-	RecursiveAvailable    uint16 = 1
+	nonRecursiveAvailable uint16 = 0
+	recursiveAvailable    uint16 = 1
 
 	// Header.Rcode Value
-	RcodeSuccess        uint16 = 0
-	RcodeFormatError    uint16 = 1
-	RcodeServerFailure  uint16 = 2
-	RcodeNameError      uint16 = 3
-	RcodeNotImplemented uint16 = 4
-	RcodeRefused        uint16 = 5
+	rcodeSuccess        uint16 = 0
+	rcodeFormatError    uint16 = 1
+	rcodeServerFailure  uint16 = 2
+	rcodeNameError      uint16 = 3
+	rcodeNotImplemented uint16 = 4
+	rcodeRefused        uint16 = 5
 )
 
 const (
 	// Type Value
-	TypeNone  uint16 = 0
-	TypeA     uint16 = 1
-	TypeNS    uint16 = 2
-	TypeCNAME uint16 = 5
-	TypeSOA   uint16 = 6
-	TypeWKS   uint16 = 11
-	TypePTR   uint16 = 12
-	TypeMX    uint16 = 15
-	TypeSRV   uint16 = 33
-	TypeAAAA  uint16 = 28
-	TypeANY   uint16 = 255
+	typeNone  uint16 = 0
+	typeA     uint16 = 1
+	typeNS    uint16 = 2
+	typeCNAME uint16 = 5
+	typeSOA   uint16 = 6
+	typeWKS   uint16 = 11
+	typePTR   uint16 = 12
+	typeMX    uint16 = 15
+	typeSRV   uint16 = 33
+	typeAAAA  uint16 = 28
+	typeANY   uint16 = 255
 
 	// Class Value
-	ClassINET uint16 = 1
+	classINET uint16 = 1
+)
+
+var (
+	errDNSPacketTooShort = errors.New("DNS packet too short")
 )
 
 func uintToType(atype uint16) string {
 	switch atype {
-	case TypeNone:
+	case typeNone:
 		return "None"
-	case TypeA:
+	case typeA:
 		return "A"
-	case TypeNS:
+	case typeNS:
 		return "NS"
-	case TypeCNAME:
+	case typeCNAME:
 		return "CNAME"
-	case TypeSOA:
+	case typeSOA:
 		return "SOA"
-	case TypeWKS:
+	case typeWKS:
 		return "WKS"
-	case TypePTR:
+	case typePTR:
 		return "PTR"
-	case TypeMX:
+	case typeMX:
 		return "Mx"
-	case TypeSRV:
+	case typeSRV:
 		return "SRV"
-	case TypeAAAA:
+	case typeAAAA:
 		return "AAAA"
-	case TypeANY:
+	case typeANY:
 		return "ANY"
 	default:
 		return "Unknown"
@@ -84,7 +90,7 @@ func uintToType(atype uint16) string {
 
 func uintToClass(aclass uint16) string {
 	switch aclass {
-	case ClassINET:
+	case classINET:
 		return "INET"
 	default:
 		return "Unknown"

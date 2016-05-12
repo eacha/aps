@@ -23,7 +23,7 @@ func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout
 }
 
 func (c *DNSConn) OpenResolver(question string) (*Response, error) {
-	query := NewQuery(question, RecursiveDesired)
+	query := NewQuery(question, recursiveDesired)
 	buf := make([]byte, 1024)
 	pack := query.Pack()
 
