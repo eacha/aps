@@ -17,7 +17,7 @@ import (
 const (
 	inputChannelBuffer  = 1
 	outputChannelBuffer = 1
-	end                 = 0
+	end                 = 1
 )
 
 var (
@@ -71,14 +71,14 @@ func printModules() {
 func main() {
 	var (
 		wg     sync.WaitGroup
-		finish = make(chan int)
+		endWrite = make(chan int)
 		ts     = make([]*thread.Statistic, int(options.Threads))
 	)
 	wg.Add(int(options.Threads))
 	options.WaitGroup = &wg
 
 	go thread.ReadChannel(options.InputFileName, options.InputChan)
-	go thread.WriteChannel(options.OutputFileName, options.OutputChan, finish)
+	go thread.WriteChannel(options.OutputFileName, options.OutputChan, endWrite)
 
 	switch options.Module {
 	case "DNS":
@@ -91,11 +91,10 @@ func main() {
 	}
 
 	wg.Wait()
-	finish <- end
+	endWrite <- end
 
 	for _, value := range ts {
 		j, _ := json.Marshal(*value)
-		//todo Log
 		fmt.Println(string(j))
 	}
 }

@@ -3,7 +3,6 @@ package dns
 import (
 	"github.com/eacha/aps/scan"
 	"github.com/eacha/aps/tools/thread"
-	"fmt"
 )
 
 func Scan(options *scan.Options, statistic *thread.Statistic) {
@@ -15,7 +14,7 @@ func Scan(options *scan.Options, statistic *thread.Statistic) {
 		}
 		statistic.IncreaseProcessedLines()
 
-		fmt.Println(address)
+		options.OutputChan <- address
 	}
 	statistic.SetEndTime()
 }
