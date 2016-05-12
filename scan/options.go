@@ -7,7 +7,7 @@ import (
 )
 
 type Scannable interface {
-	Scan(name int, options *Options, statistic *thread.Statistic)
+	Scan(options *Options, statistic *thread.Statistic)
 }
 
 type DNSOptions struct {
@@ -22,8 +22,8 @@ type Options struct {
 	InputFileName  string
 	OutputFileName string
 
-	InputFile  *thread.SyncRead
-	OutputFile *thread.SyncWrite
+	InputChan chan string
+	OutputChan chan string
 
 	Port   uint
 	Module string

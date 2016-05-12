@@ -5,13 +5,19 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"sync"
 
-	"github.com/eacha/aps/dns"
 	"github.com/eacha/aps/scan"
-	"github.com/eacha/aps/tools/connection"
 	"github.com/eacha/aps/tools/thread"
 	"github.com/eacha/aps/util"
+	"github.com/eacha/aps/dns"
+	"sync"
+	"encoding/json"
+)
+
+const (
+	inputChannelBuffer  = 1
+	outputChannelBuffer = 1
+	end                 = 0
 )
 
 var (
@@ -27,7 +33,7 @@ func init() {
 	flag.StringVar(&options.OutputFileName, "output-file", "-", "Output file name, use - for stdout")
 	flag.UintVar(&options.Port, "port", 0, "Port number to scan")
 	flag.StringVar(&options.Module, "module", "", "Set module to scan")
-	flag.UintVar(&options.Threads, "threads", 1000, "Set the number of corutines")
+	flag.UintVar(&options.Threads, "threads", 1, "Set the number of corutines")
 	flag.UintVar(&options.ConnectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
 	flag.UintVar(&options.IOTimeout, "io-timeout", 10, "Set input output timeout in seconds")
 
@@ -50,8 +56,8 @@ func init() {
 		log.Fatal("--module must be in the --module-list")
 	}
 
-	options.InputFile = thread.NewSyncRead(options.InputFileName)
-	options.OutputFile = thread.NewSyncWrite(options.OutputFileName)
+	options.InputChan = make(chan string, inputChannelBuffer)
+	options.OutputChan = make(chan string, outputChannelBuffer)
 }
 
 func printModules() {
@@ -63,36 +69,33 @@ func printModules() {
 }
 
 func main() {
-	var wg sync.WaitGroup
-	//ts := make([]thread.ThreadStatistic, options.Threads)
+	var (
+		wg     sync.WaitGroup
+		finish = make(chan int)
+		ts     = make([]*thread.Statistic, int(options.Threads))
+	)
 	wg.Add(int(options.Threads))
+	options.WaitGroup = &wg
+
+	go thread.ReadChannel(options.InputFileName, options.InputChan)
+	go thread.WriteChannel(options.OutputFileName, options.OutputChan, finish)
 
 	switch options.Module {
 	case "DNS":
-		dns.NewDNSConn(connection.TCP, "www.uchile", 10, 10, 10)
+		for i := 0; i < int(options.Threads); i++ {
+			ts[i] = thread.NewStatistic(i)
+			dns.Scan(&options, ts[i])
+		}
 	default:
+		log.Fatal("")
 	}
 
-}
+	wg.Wait()
+	finish <- end
 
-//import (
-//	//"fmt"
-//	"github.com/eacha/aps/dns"
-//	"net"
-//	"fmt"
-//	"encoding/hex"
-//)
-//
-//func main() {
-//	//conn, _ := net.Dial("udp", "200.89.70.3:53")
-//	conn, _ := net.Dial("udp", "62.133.85.107:53")
-//	query := dns.NewQuery("www.ble.cl", dns.RecursiveDesired)
-//	conn.Write(query.Pack())
-//	b := make([]byte, 1024)
-//	read, _ := conn.Read(b)
-//	fmt.Println(hex.Dump(b[:read]))
-//	var response dns.Response
-//	response.UnPack(b[:read])
-//	fmt.Println(response.Answer[0])
-//	fmt.Println(response.Answer[1])
-//}
+	for _, value := range ts {
+		j, _ := json.Marshal(*value)
+		//todo Log
+		fmt.Println(string(j))
+	}
+}
