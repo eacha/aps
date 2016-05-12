@@ -2,23 +2,26 @@ package main
 
 import (
 	"flag"
-	"github.com/eacha/aps/scan"
-	"github.com/eacha/aps/tools/thread"
-	"log"
 	"fmt"
+	"log"
 	"os"
-	"github.com/eacha/aps/util"
 	"sync"
+
+	"github.com/eacha/aps/dns"
+	"github.com/eacha/aps/scan"
+	"github.com/eacha/aps/tools/connection"
+	"github.com/eacha/aps/tools/thread"
+	"github.com/eacha/aps/util"
 )
 
 var (
-	MODULE_LIST = []string{"DNS"}
-	listModule bool
-	options scan.ScanOptions
+	modulesList = []string{"DNS"}
+	showModules bool
+	options     scan.Options
 )
 
-func init(){
-	flag.BoolVar(&listModule, "list-module", false, "Print module list and exit")
+func init() {
+	flag.BoolVar(&showModules, "list-module", false, "Print module list and exit")
 
 	flag.StringVar(&options.InputFileName, "input-file", "-", "Input file name, use - for stdin")
 	flag.StringVar(&options.OutputFileName, "output-file", "-", "Output file name, use - for stdout")
@@ -34,7 +37,7 @@ func init(){
 	flag.Parse()
 
 	// Help arguments
-	if listModule {
+	if showModules {
 		printModules()
 	}
 
@@ -43,7 +46,7 @@ func init(){
 		log.Fatal("--port must be in the range [0, 65535]")
 	}
 
-	if options.Module == "" || !util.StringInSlice(options.Module, MODULE_LIST) {
+	if options.Module == "" || !util.StringInSlice(options.Module, modulesList) {
 		log.Fatal("--module must be in the --module-list")
 	}
 
@@ -53,7 +56,7 @@ func init(){
 
 func printModules() {
 	fmt.Println("Modules:")
-	for _, mod := range MODULE_LIST{
+	for _, mod := range modulesList {
 		fmt.Printf("\t- %s\n", mod)
 	}
 	os.Exit(0)
@@ -66,19 +69,11 @@ func main() {
 
 	switch options.Module {
 	case "DNS":
-
+		dns.NewDNSConn(connection.TCP, "www.uchile", 10, 10, 10)
 	default:
-
-
 	}
 
 }
-
-
-
-
-
-
 
 //import (
 //	//"fmt"
