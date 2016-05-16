@@ -59,13 +59,14 @@ func WriteChannel(fileName string, write chan string, finish chan int) {
 		case line := <- write:
 			file.WriteString(line + "\n")
 		case <- finish:
-			select {
-			case line := <- write:
-				file.WriteString(line + "\n")
-			case <-time.After(time.Second * 3):
-				return
+			for {
+				select {
+				case line := <- write:
+					file.WriteString(line + "\n")
+				case <-time.After(time.Second * 1):
+					return
+				}
 			}
-			return
 		}
 	}
 }
