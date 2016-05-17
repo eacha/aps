@@ -1,12 +1,8 @@
 package dns
 
 import (
-	"testing"
-
 	. "gopkg.in/check.v1"
 )
-
-func TestCommon(t *testing.T) { TestingT(t) }
 
 type DNSCommon struct{}
 
