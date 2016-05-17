@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/eacha/aps/tools/thread"
+	"time"
 )
 
 type Scannable interface {
@@ -22,15 +23,15 @@ type Options struct {
 	InputFileName  string
 	OutputFileName string
 
-	InputChan chan string
+	InputChan  chan string
 	OutputChan chan string
 
-	Port   uint
+	Port   int
 	Module string
 	//Protocol string
 	Threads           uint
-	ConnectionTimeout uint
-	IOTimeout         uint
+	ConnectionTimeout time.Duration
+	IOTimeout         time.Duration
 
 	// DNS options
 	DNSOptions DNSOptions

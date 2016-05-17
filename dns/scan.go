@@ -26,18 +26,18 @@ func Scan(options *scan.Options, statistic *thread.Statistic) {
 
 func hostScan(options *scan.Options, address string) DNSData {
 	var dnsData DNSData
+	dnsData.IP = address
 
-	dnsData.ip = address
 	conn, err := NewDNSConn(connection.UDP, address, options.Port, options.ConnectionTimeout, options.IOTimeout)
 	if err != nil {
-		dnsData.error = err
+		dnsData.Error = err.Error()
 		return dnsData
 	}
 	defer conn.Close()
 
-	dnsData.openResolver, err = conn.OpenResolver(options.DNSOptions.QuestionURL, options.DNSOptions.IpResponse)
+	dnsData.OpenResolver, err = conn.OpenResolver(options.DNSOptions.QuestionURL, options.DNSOptions.IpResponse)
 	if err != nil {
-		dnsData.error = err
+		dnsData.Error = err.Error()
 		return dnsData
 	}
 

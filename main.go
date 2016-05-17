@@ -6,12 +6,13 @@ import (
 	"log"
 	"os"
 
+	"encoding/json"
+	"github.com/eacha/aps/dns"
 	"github.com/eacha/aps/scan"
 	"github.com/eacha/aps/tools/thread"
 	"github.com/eacha/aps/util"
-	"github.com/eacha/aps/dns"
 	"sync"
-	"encoding/json"
+	"time"
 )
 
 const (
@@ -21,9 +22,11 @@ const (
 )
 
 var (
-	modulesList = []string{"DNS"}
-	showModules bool
-	options     scan.Options
+	modulesList       = []string{"DNS"}
+	showModules       bool
+	options           scan.Options
+	connectionTimeout uint
+	ioTimeout         uint
 )
 
 func init() {
@@ -31,11 +34,11 @@ func init() {
 
 	flag.StringVar(&options.InputFileName, "input-file", "-", "Input file name, use - for stdin")
 	flag.StringVar(&options.OutputFileName, "output-file", "-", "Output file name, use - for stdout")
-	flag.UintVar(&options.Port, "port", 0, "Port number to scan")
+	flag.IntVar(&options.Port, "port", 0, "Port number to scan")
 	flag.StringVar(&options.Module, "module", "", "Set module to scan")
 	flag.UintVar(&options.Threads, "threads", 1, "Set the number of corutines")
-	flag.UintVar(&options.ConnectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
-	flag.UintVar(&options.IOTimeout, "io-timeout", 10, "Set input output timeout in seconds")
+	flag.UintVar(&connectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
+	flag.UintVar(&ioTimeout, "io-timeout", 10, "Set input output timeout in seconds")
 
 	flag.StringVar(&options.DNSOptions.QuestionURL, "dns-question", "www.uchile.cl", "Question sent to DNS resolver")
 	flag.StringVar(&options.DNSOptions.IpResponse, "dns-response", "172.29.1.16", "Expected response of the DNS resolver")
@@ -48,7 +51,7 @@ func init() {
 	}
 
 	// Check the arguments
-	if options.Port > 65535 {
+	if options.Port < 0 || options.Port > 65535 {
 		log.Fatal("--port must be in the range [0, 65535]")
 	}
 
@@ -56,6 +59,12 @@ func init() {
 		log.Fatal("--module must be in the --module-list")
 	}
 
+	if connectionTimeout <= 0 && ioTimeout <= 0 {
+		log.Fatal("--connection-timeout and  --io-timeout must be positive")
+	}
+
+	options.ConnectionTimeout = time.Duration(connectionTimeout)
+	options.IOTimeout = time.Duration(ioTimeout)
 	options.InputChan = make(chan string, inputChannelBuffer)
 	options.OutputChan = make(chan string, outputChannelBuffer)
 }
@@ -70,9 +79,9 @@ func printModules() {
 
 func main() {
 	var (
-		wg     sync.WaitGroup
+		wg       sync.WaitGroup
 		endWrite = make(chan int)
-		ts     = make([]*thread.Statistic, int(options.Threads))
+		ts       = make([]*thread.Statistic, int(options.Threads))
 	)
 	wg.Add(int(options.Threads))
 	options.WaitGroup = &wg

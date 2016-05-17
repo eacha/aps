@@ -2,10 +2,11 @@ package mysql
 
 import (
 	"encoding/base64"
-	. "gopkg.in/check.v1"
 	"sync"
 	"testing"
+
 	"github.com/eacha/aps/tools/test"
+	. "gopkg.in/check.v1"
 )
 
 func contains(s []string, e string) bool {

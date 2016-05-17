@@ -13,9 +13,9 @@ type DNSCommon struct{}
 var _ = Suite(&DNSCommon{})
 
 var (
-	typeTest = []struct{
+	typeTest = []struct {
 		value uint16
-		name string
+		name  string
 	}{
 		{typeNone, "None"},
 		{typeA, "A"},
@@ -30,9 +30,9 @@ var (
 		{typeANY, "ANY"},
 		{128, "Unknown"},
 	}
-	classTest = []struct{
+	classTest = []struct {
 		value uint16
-		name string
+		name  string
 	}{
 		{classINET, "INET"},
 		{255, "Unknown"},
@@ -50,9 +50,3 @@ func (dns *DNSCommon) TestUintToClass(c *C) {
 		c.Assert(uintToClass(t.value), Equals, t.name)
 	}
 }
-
-
-
-
-
-

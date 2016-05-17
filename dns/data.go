@@ -9,7 +9,7 @@ type OpenResolver struct {
 }
 
 type DNSData struct {
-	ip           string        `json:"ip,omitempty"`
-	error        string        `json:"error,omitempty"`
-	openResolver *OpenResolver `json:"open_resolveer,omitempty"`
+	IP           string        `json:"ip,omitempty"`
+	Error        string        `json:"error,omitempty"`
+	OpenResolver *OpenResolver `json:"open_resolveer,omitempty"`
 }
