@@ -1,4 +1,4 @@
-package connection
+package conn
 
 import (
 	"encoding/base64"

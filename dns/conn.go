@@ -5,18 +5,18 @@ import (
 
 	"fmt"
 
-	"github.com/eacha/aps/tools/connection"
+	"github.com/eacha/aps/tools/conn"
 )
 
 type DNSConn struct {
-	conn *connection.ConnTimeout
+	conn *conn.ConnTimeout
 }
 
 func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout time.Duration) (*DNSConn, error) {
 	var dnsConn DNSConn
 	var err error
 
-	dnsConn.conn, err = connection.NewConnTimeout(protocol, address, port, connectionTimeout, ioTimeout)
+	dnsConn.conn, err = conn.NewConnTimeout(protocol, address, port, connectionTimeout, ioTimeout)
 	if err != nil {
 		return nil, err
 	}
