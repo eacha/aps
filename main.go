@@ -23,19 +23,23 @@ const (
 
 var (
 	modulesList       = []string{"DNS"}
+	protocolList      = []string{"UDP", "TCP"}
 	showModules       bool
+	showProtocols     bool
 	options           scan.Options
 	connectionTimeout uint
 	ioTimeout         uint
 )
 
 func init() {
-	flag.BoolVar(&showModules, "list-module", false, "Print module list and exit")
+	flag.BoolVar(&showModules, "module-list", false, "Print module list and exit")
+	flag.BoolVar(&showProtocols, "protocol-list", false, "Print protocol list and exit")
 
 	flag.StringVar(&options.InputFileName, "input-file", "-", "Input file name, use - for stdin")
 	flag.StringVar(&options.OutputFileName, "output-file", "-", "Output file name, use - for stdout")
 	flag.IntVar(&options.Port, "port", 0, "Port number to scan")
 	flag.StringVar(&options.Module, "module", "", "Set module to scan")
+	flag.StringVar(&options.Protocol, "protocol", "TCP", "Set protocol to scan")
 	flag.UintVar(&options.Threads, "threads", 1, "Set the number of corutines")
 	flag.UintVar(&connectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
 	flag.UintVar(&ioTimeout, "io-timeout", 10, "Set input output timeout in seconds")
@@ -50,6 +54,10 @@ func init() {
 		printModules()
 	}
 
+	if showProtocols {
+		printProtocols()
+	}
+
 	// Check the arguments
 	if options.Port < 0 || options.Port > 65535 {
 		log.Fatal("--port must be in the range [0, 65535]")
@@ -57,6 +65,10 @@ func init() {
 
 	if options.Module == "" || !util.StringInSlice(options.Module, modulesList) {
 		log.Fatal("--module must be in the --module-list")
+	}
+
+	if !util.StringInSlice(options.Protocol, protocolList) {
+		log.Fatal("--protocol must be in the --protocol-list")
 	}
 
 	if connectionTimeout <= 0 && ioTimeout <= 0 {
@@ -72,6 +84,14 @@ func init() {
 func printModules() {
 	fmt.Println("Modules:")
 	for _, mod := range modulesList {
+		fmt.Printf("\t- %s\n", mod)
+	}
+	os.Exit(0)
+}
+
+func printProtocols() {
+	fmt.Println("protocols:")
+	for _, mod := range protocolList {
 		fmt.Printf("\t- %s\n", mod)
 	}
 	os.Exit(0)

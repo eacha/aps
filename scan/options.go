@@ -26,9 +26,9 @@ type Options struct {
 	InputChan  chan string
 	OutputChan chan string
 
-	Port   int
-	Module string
-	//Protocol string
+	Port              int
+	Module            string
+	Protocol          string
 	Threads           uint
 	ConnectionTimeout time.Duration
 	IOTimeout         time.Duration
