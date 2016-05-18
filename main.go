@@ -105,6 +105,7 @@ func main() {
 		endWrite = make(chan int)
 		ts       = make([]*thread.Statistic, int(options.Threads))
 	)
+	// Todo Move to the module case
 	wg.Add(int(options.Threads))
 	options.WaitGroup = &wg
 

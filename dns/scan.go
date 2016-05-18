@@ -2,8 +2,8 @@ package dns
 
 import (
 	"encoding/json"
+
 	"github.com/eacha/aps/scan"
-	"github.com/eacha/aps/tools/conn"
 	"github.com/eacha/aps/tools/thread"
 )
 
@@ -28,7 +28,7 @@ func hostScan(options *scan.Options, address string) DNSData {
 	var dnsData DNSData
 	dnsData.IP = address
 
-	conn, err := NewDNSConn(conn.UDP, address, options.Port, options.ConnectionTimeout, options.IOTimeout)
+	conn, err := NewDNSConn(options.Protocol, address, options.Port, options.ConnectionTimeout, options.IOTimeout)
 	if err != nil {
 		dnsData.Error = err.Error()
 		return dnsData
