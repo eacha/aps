@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"net"
+	"regexp"
 	"strconv"
 	"time"
 )
@@ -38,7 +39,78 @@ func (tbs *TestingBasicServer) RunServer() {
 	}
 }
 
-// Return a random port number between 20000 and 40000
+func ConnectionServer(protocol string, port *int, sleep time.Duration) {
+	l, err := net.Listen(protocol, ":0")
+	if err != nil {
+		fmt.Println(err)
+	}
+	*port = parsePort(l.Addr().String())
+	defer l.Close()
+
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer conn.Close()
+
+	time.Sleep(sleep * time.Millisecond)
+}
+
+func ServerWrite(port *int, buf []byte, sleep time.Duration) {
+	l, err := net.Listen("tcp", ":0")
+	if err != nil {
+		fmt.Println(err)
+	}
+	*port = parsePort(l.Addr().String())
+	defer l.Close()
+
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer conn.Close()
+
+	_, err = conn.Write(buf)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	time.Sleep(sleep * time.Millisecond)
+}
+
+func ServerReadAndClose(port *int, sleep time.Duration) {
+	buf := make([]byte, 10)
+	l, err := net.Listen("tcp", ":0")
+	if err != nil {
+		fmt.Println(err)
+	}
+	*port = parsePort(l.Addr().String())
+	defer l.Close()
+
+	conn, err := l.Accept()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	conn.Read(buf)
+	conn.Close()
+
+	time.Sleep(sleep * time.Millisecond)
+}
+
+// Return a random port number between 10000 and 60000
 func RandomPort() int {
-	return rand.Intn(20000) + 20000
+	return rand.Intn(50000) + 10000
+}
+
+func parsePort(address string) int {
+	re, _ := regexp.Compile(`.*?(\d+)$`)
+	match := re.FindStringSubmatch(address)
+
+	port, _ := strconv.Atoi(match[1])
+	return port
 }

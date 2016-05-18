@@ -22,8 +22,8 @@ func ReadChannel(fileName string, read chan string) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer file.Close()
 	}
-	defer file.Close()
 
 	reader = bufio.NewReader(file)
 	for {
@@ -51,8 +51,8 @@ func WriteChannel(fileName string, write chan string, finish chan int) {
 		if err != nil {
 			log.Fatal(err)
 		}
+		defer file.Close()
 	}
-	defer file.Close()
 
 	for {
 		select {

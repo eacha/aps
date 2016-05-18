@@ -1,4 +1,4 @@
-package connection
+package conn
 
 import (
 	"encoding/base64"
@@ -20,8 +20,9 @@ var (
 )
 
 func (s *ConnTimeoutSuite) TestNewConnectionRefuse(c *C) {
-	_, err := NewConnTimeout(TCP, "", 1, 10, 10)
+	conn, err := NewConnTimeout(TCP, "", 1, 10, 10)
 
+	c.Assert(conn, IsNil)
 	c.Assert(err, DeepEquals, &ConnError{ConnRefusedMsg, ""})
 }
 

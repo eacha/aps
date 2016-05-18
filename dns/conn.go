@@ -3,20 +3,18 @@ package dns
 import (
 	"time"
 
-	"fmt"
-
-	"github.com/eacha/aps/tools/connection"
+	"github.com/eacha/aps/tools/conn"
 )
 
 type DNSConn struct {
-	conn *connection.ConnTimeout
+	conn *conn.ConnTimeout
 }
 
 func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout time.Duration) (*DNSConn, error) {
 	var dnsConn DNSConn
 	var err error
 
-	dnsConn.conn, err = connection.NewConnTimeout(protocol, address, port, connectionTimeout, ioTimeout)
+	dnsConn.conn, err = conn.NewConnTimeout(protocol, address, port, connectionTimeout, ioTimeout)
 	if err != nil {
 		return nil, err
 	}
@@ -48,8 +46,6 @@ func (c *DNSConn) OpenResolver(question, expected string) (*OpenResolver, error)
 	data.Answers = response.Answer
 	data.RecursionAvailable = ((response.Header.Bits >> _RA) & 0x1) == 1
 	data.ResolveCorrectly = resolveCorrectly(data.Answers, expected)
-
-	fmt.Println(data.RecursionAvailable)
 
 	return &data, nil
 }
