@@ -57,8 +57,8 @@ func (s *ChanSuite) TestWriteChannel(c *C) {
 	go WriteChannel(outputName, write, end)
 
 	write <- "1234"
-	write <- "4567"
 	end <- 1
+	write <- "4567"
 
 	time.Sleep(time.Second * 2)
 
