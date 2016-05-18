@@ -3,8 +3,6 @@ package dns
 import (
 	"time"
 
-	"fmt"
-
 	"github.com/eacha/aps/tools/conn"
 )
 
@@ -48,8 +46,6 @@ func (c *DNSConn) OpenResolver(question, expected string) (*OpenResolver, error)
 	data.Answers = response.Answer
 	data.RecursionAvailable = ((response.Header.Bits >> _RA) & 0x1) == 1
 	data.ResolveCorrectly = resolveCorrectly(data.Answers, expected)
-
-	fmt.Println(data.RecursionAvailable)
 
 	return &data, nil
 }
