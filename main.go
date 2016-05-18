@@ -7,12 +7,14 @@ import (
 	"os"
 
 	"encoding/json"
-	"github.com/eacha/aps/dns"
-	"github.com/eacha/aps/scan"
-	"github.com/eacha/aps/tools/thread"
-	"github.com/eacha/aps/util"
 	"sync"
 	"time"
+
+	"github.com/eacha/aps/dns"
+	"github.com/eacha/aps/scan"
+	"github.com/eacha/aps/tools/conn"
+	"github.com/eacha/aps/tools/thread"
+	"github.com/eacha/aps/util"
 )
 
 const (
@@ -23,7 +25,7 @@ const (
 
 var (
 	modulesList       = []string{"DNS"}
-	protocolList      = []string{"UDP", "TCP"}
+	protocolList      = []string{conn.UDP, conn.TCP}
 	showModules       bool
 	showProtocols     bool
 	options           scan.Options
@@ -39,7 +41,7 @@ func init() {
 	flag.StringVar(&options.OutputFileName, "output-file", "-", "Output file name, use - for stdout")
 	flag.IntVar(&options.Port, "port", 0, "Port number to scan")
 	flag.StringVar(&options.Module, "module", "", "Set module to scan")
-	flag.StringVar(&options.Protocol, "protocol", "TCP", "Set protocol to scan")
+	flag.StringVar(&options.Protocol, "protocol", conn.TCP, "Set protocol to scan")
 	flag.UintVar(&options.Threads, "threads", 1, "Set the number of corutines")
 	flag.UintVar(&connectionTimeout, "connection-timeout", 10, "Set connection timeout in seconds")
 	flag.UintVar(&ioTimeout, "io-timeout", 10, "Set input output timeout in seconds")
