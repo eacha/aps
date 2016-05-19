@@ -27,6 +27,7 @@ const (
 	_RA     = 7
 )
 
+// Header represent a dns header defined in RFC-1035
 type Header struct {
 	ID      uint16 `json:"id,omitempty"`
 	Bits    uint16 `json:"bits,omitempty"`
@@ -36,12 +37,14 @@ type Header struct {
 	Arcount uint16 `json:"ar_count,omitempty"`
 }
 
+// Question represent a dns Question defined in RFC-1035
 type Question struct {
 	Qname  string `json:"name,omitempty"`
 	Qtype  uint16 `json:"type,omitempty"`
 	Qclass uint16 `json:"class,omitempty"`
 }
 
+// Answer represent a generic dns answer defined in RFC-1035
 type Answer struct {
 	Aname    string `json:"name,omitempty"`
 	Atype    uint16 `json:"type,omitempty"`
@@ -51,11 +54,13 @@ type Answer struct {
 	RdData   string `json:"rd_data,omitempty"`
 }
 
+// Query is an abstraction to simplify, the sending of dns name query
 type Query struct {
 	Header   Header
 	Question Question
 }
 
+// Response is an abstraction to simplify, the parsing of dns response
 type Response struct {
 	Header   Header
 	Question []Question
@@ -173,6 +178,7 @@ func bytesToQname(buf []byte, pos int) (string, int, error) {
 	return name, nullPos + 1, nil
 }
 
+// MarshalJSON converts a question to a json byte array and replaces the constants for a human readable text.
 func (q Question) MarshalJSON() ([]byte, error) {
 	type Alias Question
 	return json.Marshal(&struct {
@@ -222,6 +228,7 @@ func (a *Answer) unpackBuffer(buf []byte, pos int) (int, error) {
 	return pos, nil
 }
 
+// MarshalJSON converts an answer to a json byte array and replaces the constants for a human readable text.
 func (a Answer) MarshalJSON() ([]byte, error) {
 	type Alias Answer
 	return json.Marshal(&struct {
@@ -235,6 +242,8 @@ func (a Answer) MarshalJSON() ([]byte, error) {
 	})
 }
 
+// NewQuery create a query with the question contains in name and the parameters in recursive.
+// It return a query struct.
 func NewQuery(name string, recursive uint16) *Query {
 	var q Query
 
@@ -244,6 +253,8 @@ func NewQuery(name string, recursive uint16) *Query {
 	return &q
 }
 
+// Pack converts a query struct in a byte array
+// It return a bit representation of query in a byte array
 func (q *Query) Pack() []byte {
 	buf := make([]byte, bufferSize)
 
@@ -253,7 +264,9 @@ func (q *Query) Pack() []byte {
 	return buf[:offset]
 }
 
-func (q *Query) UnPack(buf []byte) error {
+// Unpack converts a byte array into a query struct
+// It return a error if the size of buffer is too short
+func (q *Query) Unpack(buf []byte) error {
 	pos, err := q.Header.unpackBuffer(buf, 0)
 	if err != nil {
 		return err
@@ -267,7 +280,9 @@ func (q *Query) UnPack(buf []byte) error {
 	return nil
 }
 
-func (r *Response) UnPack(buf []byte) error {
+// Unpack converts a byte array into a response struct
+// It return a error if the size of buffer is too short
+func (r *Response) Unpack(buf []byte) error {
 	pos, err := r.Header.unpackBuffer(buf, 0)
 	if err != nil {
 		return err

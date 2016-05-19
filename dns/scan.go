@@ -24,8 +24,8 @@ func Scan(options *scan.Options, statistic *thread.Statistic) {
 	statistic.SetEndTime()
 }
 
-func hostScan(options *scan.Options, address string) DNSData {
-	var dnsData DNSData
+func hostScan(options *scan.Options, address string) Data {
+	var dnsData Data
 	dnsData.IP = address
 
 	conn, err := NewDNSConn(options.Protocol, address, options.Port, options.ConnectionTimeout, options.IOTimeout)

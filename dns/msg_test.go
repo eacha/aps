@@ -133,7 +133,7 @@ func (dns *DNSMsg) TestPackQuery(c *C) {
 
 func (dns *DNSMsg) TestUnpackQuery(c *C) {
 	var query Query
-	query.UnPack(packQuery)
+	query.Unpack(packQuery)
 
 	c.Assert(query.Header.ID, Equals, id)
 	c.Assert(query.Header.Bits, Equals, bits)
@@ -153,10 +153,10 @@ func (dns *DNSMsg) TestUnpackQueryError(c *C) {
 		emptyByte []byte
 	)
 
-	err := query.UnPack(emptyByte)
+	err := query.Unpack(emptyByte)
 	c.Assert(err, Equals, errDNSPacketTooShort)
 
-	err = query.UnPack(make([]byte, 12))
+	err = query.Unpack(make([]byte, 12))
 	c.Assert(err, Equals, errDNSPacketTooShort)
 
 }
@@ -227,7 +227,7 @@ func (dns *DNSMsg) TestMarshalAnswer(c *C) {
 
 func (dns *DNSMsg) TestUnpackResponse(c *C) {
 	var response Response
-	response.UnPack(packResponse)
+	response.Unpack(packResponse)
 
 	c.Assert(response.Header.ID, Equals, id)
 	c.Assert(response.Header.Bits, Equals, bits)
@@ -259,12 +259,12 @@ func (dns *DNSMsg) TestUnpackResponseError(c *C) {
 		emptyByte []byte
 	)
 
-	err := response.UnPack(emptyByte)
+	err := response.Unpack(emptyByte)
 	c.Assert(err, Equals, errDNSPacketTooShort)
 
-	err = response.UnPack(unpackResponseQuestionError)
+	err = response.Unpack(unpackResponseQuestionError)
 	c.Assert(err, Equals, errDNSPacketTooShort)
 
-	err = response.UnPack(unpackTypeCnameError)
+	err = response.Unpack(unpackTypeCnameError)
 	c.Assert(err, Equals, errDNSPacketTooShort)
 }

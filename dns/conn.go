@@ -6,12 +6,16 @@ import (
 	"github.com/eacha/aps/tools/conn"
 )
 
-type DNSConn struct {
+// Conn is a specific connection to perform dns queries
+type Conn struct {
 	conn *conn.ConnTimeout
 }
 
-func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout time.Duration) (*DNSConn, error) {
-	var dnsConn DNSConn
+// NewDNSConn connect to the address and port on the named network. Take a connectionTimeout to perform a connection
+// and set ioTimeout to read and write operations.
+// It return the connection and any connection error encountered.
+func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout time.Duration) (*Conn, error) {
+	var dnsConn Conn
 	var err error
 
 	dnsConn.conn, err = conn.NewConnTimeout(protocol, address, port, connectionTimeout, ioTimeout)
@@ -22,7 +26,10 @@ func NewDNSConn(protocol, address string, port int, connectionTimeout, ioTimeout
 	return &dnsConn, nil
 }
 
-func (c *DNSConn) OpenResolver(question, expected string) (*OpenResolver, error) {
+// OpenResolver send a dns query who contains the specify question to resolve and check if the response is equals to
+// expected. if positive the server has a open dns resolver.
+// It return a Open Resolver struct with the data and any error encountered.
+func (c *Conn) OpenResolver(question, expected string) (*OpenResolver, error) {
 	var data OpenResolver
 	buf := make([]byte, bufferSize)
 
@@ -38,7 +45,7 @@ func (c *DNSConn) OpenResolver(question, expected string) (*OpenResolver, error)
 	data.RawResponse = buf[:b]
 
 	var response Response
-	if err = response.UnPack(buf[:b]); err != nil {
+	if err = response.Unpack(buf[:b]); err != nil {
 		return nil, err
 	}
 
@@ -59,6 +66,7 @@ func resolveCorrectly(ans []Answer, expected string) bool {
 	return false
 }
 
-func (c *DNSConn) Close() {
+// Close closes the connection.
+func (c *Conn) Close() {
 	c.conn.Close()
 }
